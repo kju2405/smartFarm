@@ -159,7 +159,7 @@ class _EditingPageState extends State<EditingPage> {
                           labelText: 'The daylight that will be keeped',
                           hintText: 'Daylight',
                         ),
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.name,
                       ),
                       SizedBox(
                         height: 40.0,

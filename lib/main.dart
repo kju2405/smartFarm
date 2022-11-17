@@ -3,6 +3,7 @@ import 'package:the_latest_tech/new.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:the_latest_tech/screens/setting_screen.dart';
 import 'data/network.dart';
+import 'screens/main_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,24 +41,34 @@ class _Settings extends State<Settings> {
     fetchData();
   }
 
-
   void fetchData() async {
     Network network = Network('http://43.201.136.217/settings');
     var settingData = await network.getJsonData();
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SettingScreen(parseSettingData: settingData,);
-    }));
-  }
+    Future.delayed(Duration(milliseconds: 3000),() {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return MainScreen(parseSettingData: settingData,);
+        //   SettingScreen(
+        //   parseSettingData: settingData,
+        // );
+      }));
+    }
+    );
 
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green,
       body: Center(
-        child: Text('Data loading',
+        child: Text(
+          'My Plant',
           style: TextStyle(
-            fontSize: 30,
-          ),),
+            fontSize: 50,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }

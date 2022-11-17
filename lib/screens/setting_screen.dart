@@ -116,7 +116,9 @@ class _SettingScreenState extends State<SettingScreen> {
         backgroundColor: Colors.green,
         centerTitle: true,
         elevation: 0.2,
-        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () {}),
+        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () {
+          Navigator.pop(context);
+        }),
         actions: [
           IconButton(
             onPressed: () async {
@@ -145,7 +147,7 @@ class _SettingScreenState extends State<SettingScreen> {
               // updateData(settingData);
               // print(environmentData.length);
               // print(titleList.length);
-              // refresh();
+              refresh();
               setState(() {});
             },
             icon: Icon(
@@ -165,7 +167,14 @@ class _SettingScreenState extends State<SettingScreen> {
           return Padding(
             padding: EdgeInsets.all(15.0),
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                // Navigator.of(context).push(MaterialPageRoute(
+                //     builder: (context) => EditingPage(
+                //       environment: environmentData[index],
+                //       settingId: idList[index],
+                //     )));
+                // debugPrint(titleList[index]);
+              },
               child: Card(
                 child: Padding(
                   padding: EdgeInsets.only(
