@@ -91,6 +91,7 @@ class _SettingScreenState extends State<SettingScreen> {
     // }
 
     updateData(settingData);
+    updateData(settingData);
     print(settingData[0]['_id'].runtimeType);
     print(environmentData.length);
     print(titleList.length);

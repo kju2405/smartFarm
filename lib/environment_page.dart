@@ -17,6 +17,7 @@ class EditingPage extends StatefulWidget {
 
 class _EditingPageState extends State<EditingPage> {
   bool status = false;
+  bool selected=false;
   TextEditingController name =
       TextEditingController(); //TextField에서 입력된 값을 가져올때 사용함.
   TextEditingController temperature =
@@ -160,6 +161,46 @@ class _EditingPageState extends State<EditingPage> {
                           hintText: 'Daylight',
                         ),
                         keyboardType: TextInputType.name,
+                      ),
+                      SizedBox(
+                        height: 25.0,
+                      ),
+                      Row(
+                        children: [
+                          Padding(padding: EdgeInsets.only(top: 50)),
+                          Text(
+                            'Selected',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20.0,
+                          ),
+                          FlutterSwitch(
+                            activeColor: Colors.orangeAccent,
+                            width: 60.0,
+                            height: 30.0,
+                            valueFontSize: 12.0,
+                            toggleSize: 20.0,
+                            value: selected,
+                            borderRadius: 30.0,
+                            padding: 6.0,
+                            showOnOff: true,
+                            onToggle: (val) {
+                              setState(() {
+                                selected = val;
+                              });
+                              print('$selected');
+                              if (selected) {
+                                //API를 통해 selected(true)값 전달
+                              } else {
+                                //API를 통해 selected(false)값 전달
+                              }
+                            },
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: 40.0,
