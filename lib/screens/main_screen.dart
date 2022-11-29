@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:the_latest_tech/screens/plant_info_screen.dart';
 import 'package:the_latest_tech/screens/setting_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -75,8 +76,36 @@ class _MainScreenState extends State<MainScreen> {
                   ]),
               child: Column(
                 children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return PlantInfoScreen();
+                          }));
+                    },
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(width: 20),
+                        Text(
+                          'My Plant',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          color: Colors.white,
+                          iconSize: 20,
+                          icon: Icon(Icons.arrow_forward_ios),
+                        ),
+                      ],
+                    ),
+                  ),
                   Container(
-                    height: 170,
+                    height: 150,
                     width: MediaQuery.of(context).size.width - 80,
                     decoration: BoxDecoration(
                       color: Colors.green,
@@ -84,7 +113,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ),
                   Container(
-                    height: 130,
+                    height: 100,
                     width: MediaQuery.of(context).size.width - 80,
                     decoration: BoxDecoration(
                       color: Colors.grey,
