@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_latest_tech/new.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:the_latest_tech/screens/plant_info_screen.dart';
 import 'package:the_latest_tech/screens/setting_screen.dart';
 import 'data/network.dart';
 import 'screens/main_screen.dart';
@@ -23,6 +24,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => Settings(),
         '/new': (context) => New(),
+        '/plant_info': (context) => PlantInfoScreen(),
       },
     );
   }
