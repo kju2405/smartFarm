@@ -61,6 +61,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/plant.png
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -71,6 +74,7 @@ flutter:
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
+
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
@@ -89,5 +93,14 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+fonts:
+  - family: IBM
+    fonts:
+      - asset: assets/fonts/IBMPlexSansKR-Regular.otf
+        weight: 400
+      - asset: assets/fonts/IBMPlexSansKR-Medium.otf
+        weight: 500
+      - asset: assets/fonts/IBMPlexSansKR-Bold.otf
+        weight: 700
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
