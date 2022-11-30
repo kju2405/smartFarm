@@ -48,10 +48,9 @@ class _Settings extends State<Settings> {
     var settingData = await network.getJsonData();
     Future.delayed(Duration(milliseconds: 3000),() {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
+        print('settingData');
+        print(settingData);
         return MainScreen(parseSettingData: settingData,);
-        //   SettingScreen(
-        //   parseSettingData: settingData,
-        // );
       }));
     }
     );
@@ -62,14 +61,43 @@ class _Settings extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green,
-      body: Center(
-        child: Text(
-          'My Plant',
-          style: TextStyle(
-            fontSize: 50,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/plant1.jpeg"),
+            fit: BoxFit.cover,
           ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              height: 200,
+            ),
+            const Text(
+              "Hello Welcome to",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 34),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text(
+              'Smart Farm',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 44),
+            ),
+            const SizedBox(
+              height: 200,
+            ),
+          ],
         ),
       ),
     );

@@ -6,10 +6,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class EditingPage extends StatefulWidget {
-  const EditingPage({Key? key, required this.environment,required this.settingId}) : super(key: key);
+  const EditingPage(
+      {Key? key,
+      required this.environment,
+      required this.settingId,
+      required this.selectedStatus})
+      : super(key: key);
 
   final Environment environment;
   final String settingId;
+  final bool selectedStatus;
 
   @override
   State<EditingPage> createState() => _EditingPageState();
@@ -17,7 +23,7 @@ class EditingPage extends StatefulWidget {
 
 class _EditingPageState extends State<EditingPage> {
   bool status = false;
-  bool selected=false;
+  bool selected = false;
   TextEditingController name =
       TextEditingController(); //TextField에서 입력된 값을 가져올때 사용함.
   TextEditingController temperature =
@@ -35,6 +41,19 @@ class _EditingPageState extends State<EditingPage> {
     soil_moisture =
         new TextEditingController(text: widget.environment.soilMoisture);
     daylight = new TextEditingController(text: widget.environment.daylight);
+    selected = widget.selectedStatus;
+  }
+
+  applySelectedStatus() async {
+    var url = 'http://43.201.136.217/select/setting';
+    var body = {
+      '_id': widget.settingId,
+      "selected": selected,
+    };
+    var data = await http.post(Uri.parse(url),
+        body: json.encode(body),
+        headers: {"Content-Type": "application/json"},
+        encoding: Encoding.getByName("utf-8"));
   }
 
   @override
@@ -193,11 +212,6 @@ class _EditingPageState extends State<EditingPage> {
                                 selected = val;
                               });
                               print('$selected');
-                              if (selected) {
-                                //API를 통해 selected(true)값 전달
-                              } else {
-                                //API를 통해 selected(false)값 전달
-                              }
                             },
                           ),
                         ],
@@ -209,7 +223,7 @@ class _EditingPageState extends State<EditingPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
-                            onPressed: () async{
+                            onPressed: () async {
                               if (name.text == '' ||
                                   temperature.text == '' ||
                                   humidity.text == '' ||
@@ -218,13 +232,14 @@ class _EditingPageState extends State<EditingPage> {
                                 showSnackBar(context);
                               } else {
                                 final response = await http.post(
-                                  Uri.parse('http://43.201.136.217/update/settings'),
+                                  Uri.parse(
+                                      'http://43.201.136.217/update/settings'),
                                   headers: <String, String>{
                                     'Content-Type':
-                                    'application/json; charset=UTF-8',
+                                        'application/json; charset=UTF-8',
                                   },
                                   body: jsonEncode(<String, String>{
-                                    '_id':widget.settingId,
+                                    '_id': widget.settingId,
                                     'name': name.text,
                                     'temp': temperature.text,
                                     'humidity': humidity.text,
@@ -232,6 +247,7 @@ class _EditingPageState extends State<EditingPage> {
                                     'light': daylight.text,
                                   }),
                                 );
+                                applySelectedStatus();
                                 print('Response status:${response.statusCode}');
                                 print('Response body:${response.body}');
                                 Navigator.pop(context);
@@ -253,7 +269,14 @@ class _EditingPageState extends State<EditingPage> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              showSnackBarDelete(context,name,temperature,humidity,soil_moisture,daylight,widget.settingId);
+                              showSnackBarDelete(
+                                  context,
+                                  name,
+                                  temperature,
+                                  humidity,
+                                  soil_moisture,
+                                  daylight,
+                                  widget.settingId);
                             },
                             child: Text(
                               'Delete',
@@ -293,7 +316,14 @@ void showSnackBar(BuildContext context) {
   );
 }
 
-void showSnackBarDelete(BuildContext context,TextEditingController name,TextEditingController temperature,TextEditingController humidity, TextEditingController soil_moisture,TextEditingController daylight,String settingId) {
+void showSnackBarDelete(
+    BuildContext context,
+    TextEditingController name,
+    TextEditingController temperature,
+    TextEditingController humidity,
+    TextEditingController soil_moisture,
+    TextEditingController daylight,
+    String settingId) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(
@@ -301,24 +331,16 @@ void showSnackBarDelete(BuildContext context,TextEditingController name,TextEdit
       ),
       action: SnackBarAction(
         label: '예',
-        onPressed: () async{
-          final response = await http.post(
-            Uri.parse('http://43.201.136.217/delete/settings'),
-            headers: <String, String>{
-              'Content-Type':
-              'application/json; charset=UTF-8',
-            },
-            body: jsonEncode(<String, String>{
-              '_id':settingId,
-              'name': name.text,
-              'temp': temperature.text,
-              'humidity': humidity.text,
-              'moisture': soil_moisture.text,
-              'light': daylight.text,
-            }),
-          );
-          print('Response status:${response.statusCode}');
-          print('Response body:${response.body}');
+        onPressed: () async {
+          var url = 'http://43.201.136.217/delete/settings';
+          var body = {
+            "_id": settingId,
+          };
+
+          var data = await http.post(Uri.parse(url),
+              body: json.encode(body),
+              headers: {"Content-Type": "application/json"},
+              encoding: Encoding.getByName("utf-8"));
           Navigator.pop(context);
         },
         textColor: Colors.white,

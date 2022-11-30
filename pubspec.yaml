@@ -63,6 +63,7 @@ flutter:
 
   assets:
     - assets/images/plant.PNG
+    - assets/images/plant1.jpeg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

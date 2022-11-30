@@ -19,6 +19,7 @@ class _SettingScreenState extends State<SettingScreen> {
   late String moisture;
   late String light;
   late String id;
+  late bool selectedStatus;
 
   static List<String> titleList = [];
   static List<String> temperatureList = [];
@@ -26,6 +27,7 @@ class _SettingScreenState extends State<SettingScreen> {
   static List<String> soilMoistureList = [];
   static List<String> daylightList = [];
   static List<String> idList = [];
+  static List<bool> selectedList = [];
   List<Environment> environmentData = [];
 
   @override
@@ -38,18 +40,50 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void addToList(dynamic settingData) {
-    settingData.forEach((s) => titleList.add(s['name']));
-    settingData.forEach((s) => temperatureList.add(s['temp']));
-    settingData.forEach((s) => humadityList.add(s['humidity']));
-    settingData.forEach((s) => soilMoistureList.add(s['moisture']));
-    settingData.forEach((s) => daylightList.add(s['light']));
-    settingData.forEach((s) => idList.add(s['_id']));
+    titleList=[];
+    temperatureList=[];
+    humadityList=[];
+    soilMoistureList=[];
+    daylightList=[];
+    idList=[];
+    selectedList=[];
+    // print('settingData.length');
+    print(settingData.length.runtimeType);
+    print(settingData.length);
+    print(settingData[1]['moistrue']);
+    final int len=settingData.length;
+    for(int i=0;i<len ;i++){
+      var settingDataTitle=settingData[i]['name'];
+      var settingDataTemp=settingData[i]['temp'];
+      var settingDataHumadity=settingData[i]['humidity'];
+      var settingDataMoisture=settingData[i]['moisture'];
+      var settingDataDaylight=settingData[i]['light'];
+      var settingDataId=settingData[i]['_id'];
+      var settingDataSelected=settingData[i]['selected'];
+
+      titleList.add(settingDataTitle);
+      temperatureList.add(settingDataTemp);
+      humadityList.add(settingDataHumadity);
+      soilMoistureList.add(settingDataMoisture);
+      daylightList.add(settingDataDaylight);
+      idList.add(settingDataId);
+      selectedList.add(settingDataSelected);
+    }
+    // settingData.forEach((s) => titleList.add(s['name']));
+    // settingData.forEach((s) => temperatureList.add(s['temp']));
+    // settingData.forEach((s) => humadityList.add(s['humidity']));
+    // settingData.forEach((s) => soilMoistureList.add(s['moisture']));
+    // settingData.forEach((s) => daylightList.add(s['light']));
+    // settingData.forEach((s) => idList.add(s['_id']));
+    // settingData.forEach((s) => selectedList.add(s['selected']));
   }
+
 
   void updateData(dynamic settingData) {
     final settingLength = settingData.length;
 
     environmentData = [];
+    selectedList = [];
     for (int i = 0; i < settingLength; i++) {
       settingName = settingData[i]['name'];
       temp = settingData[i]['temp'];
@@ -57,8 +91,10 @@ class _SettingScreenState extends State<SettingScreen> {
       moisture = settingData[i]['moisture'];
       light = settingData[i]['light'];
       id = settingData[i]['_id'];
+      selectedStatus = settingData[i]['selected'];
       environmentData
           .add(Environment(settingName, temp, humidity1, moisture, light));
+      selectedList.add(selectedStatus);
     }
     // environmentData = List.generate(
     //     titleList.length,
@@ -79,12 +115,14 @@ class _SettingScreenState extends State<SettingScreen> {
       moisture = settingData[lastLength]['moisture'];
       light = settingData[lastLength]['light'];
       id = settingData[lastLength]['_id'];
+      selectedStatus = settingData[lastLength]['selected'];
       titleList.add(settingName);
       temperatureList.add(temp);
       humadityList.add(humidity1);
       soilMoistureList.add(moisture);
       daylightList.add(light);
       idList.add(id);
+      selectedList.add(selectedStatus);
     }
     // else if(settingData.length<titleList.length){
     //   for(int i=0;i<)
@@ -117,9 +155,11 @@ class _SettingScreenState extends State<SettingScreen> {
         backgroundColor: Colors.green,
         centerTitle: true,
         elevation: 0.2,
-        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () {
-          Navigator.pop(context);
-        }),
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
         actions: [
           IconButton(
             onPressed: () async {
@@ -232,6 +272,13 @@ class _SettingScreenState extends State<SettingScreen> {
                                 color: Colors.black87,
                                 fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            Text(
+                              'selected ${selectedList[index]} ',
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold,
+                              ),
                             )
                           ],
                         ),
@@ -241,6 +288,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                 builder: (context) => EditingPage(
                                       environment: environmentData[index],
                                       settingId: idList[index],
+                                      selectedStatus: selectedList[index],
                                     )));
                             debugPrint(titleList[index]);
                           },

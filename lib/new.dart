@@ -19,8 +19,35 @@ class _NewState extends State<New> {
       TextEditingController(); //더이상 사용하지 않을때는 리소스의 낭비를 막기위해서 dispose()메서드를 호출함.
   TextEditingController humidity = TextEditingController();
   TextEditingController soil_moisture = TextEditingController();
-  TextEditingController daylight = TextEditingController();
+  // TextEditingController daylight = TextEditingController();
   bool status = false;
+
+  String? selected_daylight = "";
+  List daylightList = ['Low', 'Medium', 'High'];
+  var dayl;
+
+  addSetting() async {
+    var url = 'http://43.201.136.217/add/settings';
+    var body = {
+      "humidity": humidity.text.toString(),
+      "light": selected_daylight,
+      "moisture": soil_moisture.text.toString(),
+      "name": name.text.toString(),
+      "selected": false,
+      "temp": temperature.text.toString()
+    };
+
+    var data = await http.post(Uri.parse(url),
+        body: json.encode(body),
+        headers: {"Content-Type": "application/json"},
+        encoding: Encoding.getByName("utf-8"));
+
+    if (data.statusCode == 200) {
+      Navigator.of(context).pop();
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,14 +104,16 @@ class _NewState extends State<New> {
                           ..text = 'Default humidity';
                         soil_moisture = TextEditingController()
                           ..text = 'Default moisture';
-                        daylight = TextEditingController()
-                          ..text = 'Default daylight';
+                        // daylight = TextEditingController()
+                        //   ..text = 'Default daylight';
+                        dayl = daylightList[0];
+                        selected_daylight = dayl;
                       } else {
                         name = TextEditingController()..text = '';
                         temperature = TextEditingController()..text = '';
                         humidity = TextEditingController()..text = '';
                         soil_moisture = TextEditingController()..text = '';
-                        daylight = TextEditingController()..text = '';
+                        // daylight = TextEditingController()..text = '';
                       }
                     },
                   ),
@@ -135,13 +164,51 @@ class _NewState extends State<New> {
                         ),
                         keyboardType: TextInputType.number,
                       ),
-                      TextField(
-                        controller: daylight,
-                        decoration: InputDecoration(
-                          labelText: 'The daylight that will be keeped',
-                          hintText: 'Daylight',
+                      // TextField(
+                      //   controller: daylight,
+                      //   decoration: InputDecoration(
+                      //     labelText: 'The daylight that will be keeped',
+                      //     hintText: 'Daylight',
+                      //   ),
+                      //   keyboardType: TextInputType.text,
+                      // ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.06,
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              value: dayl,
+                              items: daylightList!.map((value) {
+                                return DropdownMenuItem(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              hint: Container(
+                                child: Text(
+                                  "The daylight that will be keeped",
+                                  style: TextStyle(color: Colors.grey),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  dayl = value;
+                                  selected_daylight = dayl;
+                                });
+                              },
+                            ),
+                          ),
                         ),
-                        keyboardType: TextInputType.text,
                       ),
                       SizedBox(
                         height: 40.0,
@@ -152,36 +219,10 @@ class _NewState extends State<New> {
                               temperature.text == '' ||
                               humidity.text == '' ||
                               soil_moisture.text == '' ||
-                              daylight.text == '') {
+                              selected_daylight == '') {
                             showSnackBar(context);
                           } else {
-                            // final url=Uri.parse('http://43.201.136.217/add/settings');
-                            // http.Response response=await http.post(url,body:{
-                            //   'name':name.text,
-                            //   'temp':temperature.text,
-                            //   'humidity':humidity.text,
-                            //   'moisture':soil_moisture.text,
-                            //   'light':daylight.text,
-                            // });
-                            // print('Response status:${response.statusCode}');
-                            // print('Response body:${response.body}');
-                            final response = await http.post(
-                              Uri.parse('http://43.201.136.217/add/settings'),
-                              headers: <String, String>{
-                                'Content-Type':
-                                    'application/json; charset=UTF-8',
-                              },
-                              body: jsonEncode(<String, String>{
-                                'name': name.text,
-                                'temp': temperature.text,
-                                'humidity': humidity.text,
-                                'moisture': soil_moisture.text,
-                                'light': daylight.text,
-                              }),
-                            );
-                            print('Response status:${response.statusCode}');
-                            print('Response body:${response.body}');
-                            Navigator.pop(context);
+                            addSetting();
                           }
                         },
                         child: Text(

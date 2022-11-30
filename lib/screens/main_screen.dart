@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:the_latest_tech/screens/plant_info_screen.dart';
 import 'package:the_latest_tech/screens/setting_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../data/network.dart';
 
 class MainScreen extends StatefulWidget {
   final parseSettingData;
@@ -18,6 +22,68 @@ class _MainScreenState extends State<MainScreen> {
   late String moisture = widget.parseSettingData[0]['moisture'];
   late String light = widget.parseSettingData[0]['light'];
   late String id = widget.parseSettingData[0]['_id'];
+
+  late Map select_setting;
+
+  // List? settings;
+
+  getSettings() async {
+    // final response =
+    // await http.get(Uri.parse('http://43.201.136.217/settings'));
+    // if (response.statusCode == 200) {
+    //   setState(() {
+    //     settings = json.decode(response.body);
+    //   });
+    // } else {
+    //   throw Exception('Failed to load data');
+    // }
+    Network network = Network('http://43.201.136.217/settings');
+    var settingData = await network.getJsonData();
+    return settingData;
+  }
+
+  goToSettingScreen() async {
+    var settings = await getSettings();
+    print('------');
+    print(settings);
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      // print(widget.parseSettingData);
+
+      return SettingScreen(
+        parseSettingData: settings,
+      );
+    }));
+  }
+
+  getSelectedSetting() async {
+    final response =
+        await http.get(Uri.parse('http://43.201.136.217/get/setting'));
+    if (response.statusCode == 200) {
+      setState(() {
+        select_setting = json.decode(response.body);
+        print(select_setting);
+        print(widget.parseSettingData);
+        if (select_setting != null) {
+          settingName = select_setting!['name'];
+          temp = select_setting['temp'];
+          humidity1 = select_setting['humidity'];
+          moisture = select_setting['moisture'];
+          light = select_setting['light'];
+          id = select_setting['_id'];
+        } else {
+          settingName = "None";
+        }
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getSelectedSetting();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +104,15 @@ class _MainScreenState extends State<MainScreen> {
           icon: Icon(Icons.menu),
           onPressed: () {},
         ),
+        actions: [
+          IconButton(
+            color: Colors.black,
+            onPressed: () {
+              getSelectedSetting();
+            },
+            icon: Icon(Icons.refresh),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -80,8 +155,8 @@ class _MainScreenState extends State<MainScreen> {
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                            return PlantInfoScreen();
-                          }));
+                        return PlantInfoScreen();
+                      }));
                     },
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -145,12 +220,7 @@ class _MainScreenState extends State<MainScreen> {
                     padding: EdgeInsets.only(left: 30),
                     child: InkWell(
                       onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return SettingScreen(
-                            parseSettingData: widget.parseSettingData,
-                          );
-                        }));
+                        goToSettingScreen();
                       },
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
