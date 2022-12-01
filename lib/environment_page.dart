@@ -231,25 +231,29 @@ class _EditingPageState extends State<EditingPage> {
                                   daylight.text == '') {
                                 showSnackBar(context);
                               } else {
-                                final response = await http.post(
-                                  Uri.parse(
-                                      'http://43.201.136.217/update/settings'),
-                                  headers: <String, String>{
-                                    'Content-Type':
-                                        'application/json; charset=UTF-8',
-                                  },
-                                  body: jsonEncode(<String, String>{
-                                    '_id': widget.settingId,
-                                    'name': name.text,
-                                    'temp': temperature.text,
-                                    'humidity': humidity.text,
-                                    'moisture': soil_moisture.text,
-                                    'light': daylight.text,
-                                  }),
-                                );
-                                applySelectedStatus();
-                                print('Response status:${response.statusCode}');
-                                print('Response body:${response.body}');
+                                // final response = await http.post(
+                                //   Uri.parse(
+                                //       'http://43.201.136.217/update/settings'),
+                                //   headers: <String, String>{
+                                //     'Content-Type':
+                                //         'application/json; charset=UTF-8',
+                                //   },
+                                //   body: jsonEncode(<String, String>{
+                                //     '_id': widget.settingId,
+                                //     'name': name.text,
+                                //     'temp': temperature.text,
+                                //     'humidity': humidity.text,
+                                //     'moisture': soil_moisture.text,
+                                //     'light': daylight.text,
+                                //   }),
+                                // );
+                                print('applyButton');
+                                print(selected);
+                                if(selected){
+                                  applySelectedStatus();
+                                }
+                                // print('Response status:${response.statusCode}');
+                                // print('Response body:${response.body}');
                                 Navigator.pop(context);
                               }
                             },

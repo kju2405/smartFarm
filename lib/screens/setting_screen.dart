@@ -40,26 +40,26 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void addToList(dynamic settingData) {
-    titleList=[];
-    temperatureList=[];
-    humadityList=[];
-    soilMoistureList=[];
-    daylightList=[];
-    idList=[];
-    selectedList=[];
+    titleList = [];
+    temperatureList = [];
+    humadityList = [];
+    soilMoistureList = [];
+    daylightList = [];
+    idList = [];
+    selectedList = [];
     // print('settingData.length');
     print(settingData.length.runtimeType);
     print(settingData.length);
     print(settingData[1]['moistrue']);
-    final int len=settingData.length;
-    for(int i=0;i<len ;i++){
-      var settingDataTitle=settingData[i]['name'];
-      var settingDataTemp=settingData[i]['temp'];
-      var settingDataHumadity=settingData[i]['humidity'];
-      var settingDataMoisture=settingData[i]['moisture'];
-      var settingDataDaylight=settingData[i]['light'];
-      var settingDataId=settingData[i]['_id'];
-      var settingDataSelected=settingData[i]['selected'];
+    final int len = settingData.length;
+    for (int i = 0; i < len; i++) {
+      var settingDataTitle = settingData[i]['name'];
+      var settingDataTemp = settingData[i]['temp'];
+      var settingDataHumadity = settingData[i]['humidity'];
+      var settingDataMoisture = settingData[i]['moisture'];
+      var settingDataDaylight = settingData[i]['light'];
+      var settingDataId = settingData[i]['_id'];
+      var settingDataSelected = settingData[i]['selected'];
 
       titleList.add(settingDataTitle);
       temperatureList.add(settingDataTemp);
@@ -77,7 +77,6 @@ class _SettingScreenState extends State<SettingScreen> {
     // settingData.forEach((s) => idList.add(s['_id']));
     // settingData.forEach((s) => selectedList.add(s['selected']));
   }
-
 
   void updateData(dynamic settingData) {
     final settingLength = settingData.length;
@@ -284,13 +283,18 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         IconButton(
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
                                 builder: (context) => EditingPage(
-                                      environment: environmentData[index],
-                                      settingId: idList[index],
-                                      selectedStatus: selectedList[index],
-                                    )));
+                                  environment: environmentData[index],
+                                  settingId: idList[index],
+                                  selectedStatus: selectedList[index],
+                                ),
+                              ),
+                            );
                             debugPrint(titleList[index]);
+                            debugPrint(environmentData[index].temperature);
+                            debugPrint(selectedList[index].toString());
                           },
                           icon: const Icon(
                             Icons.settings,
