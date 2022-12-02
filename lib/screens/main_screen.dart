@@ -28,15 +28,6 @@ class _MainScreenState extends State<MainScreen> {
   // List? settings;
 
   getSettings() async {
-    // final response =
-    // await http.get(Uri.parse('http://43.201.136.217/settings'));
-    // if (response.statusCode == 200) {
-    //   setState(() {
-    //     settings = json.decode(response.body);
-    //   });
-    // } else {
-    //   throw Exception('Failed to load data');
-    // }
     Network network = Network('http://43.201.136.217/settings');
     var settingData = await network.getJsonData();
     return settingData;
@@ -44,11 +35,9 @@ class _MainScreenState extends State<MainScreen> {
 
   goToSettingScreen() async {
     var settings = await getSettings();
-    print('------');
     print(settings);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       // print(widget.parseSettingData);
-
       return SettingScreen(
         parseSettingData: settings,
       );
