@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/link.dart';
+import 'dart:convert';
+import 'dart:async';
 
 import '../components/modal_button.dart'; // TODO: 수정 예정
 import '../components/category_value_with_bar.dart';
+import 'package:http/http.dart' as http;
 
 import '../data/network.dart';
 
@@ -17,10 +22,26 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
   late String soilMoisture = '';
   late String daylight = '';
   late String settingName = '';
+  late List settings =[];
+  var selected_setting;
+  late Map select_setting = {};
 
   @override
   void initState() {
     fetchData();
+    getSettings();
+  }
+
+  void getSettings() async {
+    final response =
+    await http.get(Uri.parse('http://43.201.136.217/settings'));
+    if (response.statusCode == 200) {
+      setState(() {
+        settings = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
   }
 
   void fetchData() async {
@@ -33,7 +54,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
     Future.delayed(Duration(milliseconds: 100), () {
       setState(() {
 
-        this.settingName = settingData['name'];
+        select_setting = settingData;
 
         for(int i=0; i < sensorData.length; i++){
           if(sensorData[i]['name'] == 'temp') this.temp = sensorData[i]['value'].toInt().toString() + '℃' ;
@@ -54,9 +75,52 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
     });
   }
 
-  void deviceControl(String device) async {
-    Network deviceNetwork = Network('http://43.201.136.217/activate/${device}');
-    var deviceData = await deviceNetwork.getJsonData();
+  setSelectSetting(String id) async {
+    var url = 'http://43.201.136.217/select/setting';
+    var body = {"_id": id};
+
+    var data = await http.post(Uri.parse(url),
+        body: json.encode(body),
+        headers: {"Content-Type": "application/json"},
+        encoding: Encoding.getByName("utf-8"));
+
+    if (data.statusCode == 200) {
+      setState(() {
+        select_setting = json.decode(data.body);
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  void activateDevice(String device) async {
+    final response =
+    await http.get(Uri.parse('http://43.201.136.217/activate/${device}'));
+    print(response.statusCode);
+  }
+
+  Future<void> openBrowser() async {
+    final Uri url =
+    Uri(scheme: 'https', host: 'www.cylog.org', path: 'headers/');
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Future<void> _launchInWebViewOrVC() async {
+    final Uri url =
+    Uri(scheme: 'https', host: 'www.cylog.org', path: 'headers/');
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.inAppWebView,
+      webViewConfiguration: const WebViewConfiguration(
+          headers: <String, String>{'my_header_key': 'my_header_value'}),
+    )) {
+      throw 'Could not launch $url';
+    }
   }
 
   Widget _deviceControlButton() {
@@ -87,7 +151,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
             ],
           ),
           onPressed: () async {
-            deviceControl('pump');
+            activateDevice('pump');
           },
         ),
         SizedBox(width:10),
@@ -115,7 +179,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
             ],
           ),
           onPressed: () async {
-            deviceControl('led');
+            activateDevice('led');
           },
         ),
         SizedBox(width:10),
@@ -143,7 +207,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
             ],
           ),
           onPressed: () async {
-            deviceControl('fan');
+            activateDevice('fan');
           },
         ),
       ],
@@ -166,7 +230,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             color: Colors.white,
-            onPressed: fetchData,
+            onPressed: () => fetchData(),
             iconSize: 30,
           ),
         ],
@@ -236,8 +300,46 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
                     child: Column(
                       children: [
                         SizedBox(height: 30),
-                        CategoryValuesWithBar(180, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), 'Auto-care Activated', 15, Colors.black, settingName, 12, Color.fromRGBO(63, 60, 60, 1)),
+                        CategoryValuesWithBar(180, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), 'Auto-care Status', 15, Colors.black, "${select_setting!['name']}", 12, Color.fromRGBO(63, 60, 60, 1)),
                         SizedBox(height: 20),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          height: MediaQuery.of(context).size.height * 0.055,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding:
+                            const EdgeInsets.only(left: 20.0, right: 20.0),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                value: selected_setting,
+                                items: settings!.map((value) {
+                                  return DropdownMenuItem(
+                                    value: value,
+                                    child: Text(value['name']),
+                                  );
+                                }).toList(),
+                                hint: Container(
+                                  child: Text(
+                                    "Select Auto-care Settings",
+                                    style: TextStyle(color: Colors.grey),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selected_setting = value;
+                                  });
+                                  print(selected_setting['_id']);
+                                  setSelectSetting(selected_setting['_id']);
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 18),
                         _deviceControlButton(), // 장치 작동 버튼
                         SizedBox(height: 18),
                         ElevatedButton(
@@ -249,32 +351,14 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
                             minimumSize: Size(335,60),
                             // alignment: Alignment.center,
                           ),
-                          onPressed: () {}, // TODO: 구현 필요
+                          onPressed: () async {   //TODO: 카메
+                            final url = Uri.parse('https://google.com');
+                            if (await canLaunchUrl(url)) {
+                              launchUrl(url, mode: LaunchMode.externalApplication);라
+                            }
+                          },
                           child: Text(
                             'Real-time Monitoring',
-                            style: TextStyle(
-                              fontFamily: "IBM",
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        // TODO: dropdownbutton 이상 문제로 다시 확인 필요
-                        // ModalButton(name: 'Auto-care setting', currentSetting: settingName),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(33)
-                            ),
-                            primary: Color.fromRGBO(135, 125, 124, 0.8),
-                            minimumSize: Size(335,60),
-                            // alignment: Alignment.center,
-                          ),
-                          onPressed: () {}, // TODO: 구현 필요
-                          child: Text(
-                            'Auto-care Setting',
                             style: TextStyle(
                               fontFamily: "IBM",
                               color: Colors.white,
