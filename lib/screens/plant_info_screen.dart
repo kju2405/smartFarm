@@ -351,10 +351,10 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
                             minimumSize: Size(335,60),
                             // alignment: Alignment.center,
                           ),
-                          onPressed: () async {   //TODO: 카메
+                          onPressed: () async {   //TODO: 카메라
                             final url = Uri.parse('https://google.com');
                             if (await canLaunchUrl(url)) {
-                              launchUrl(url, mode: LaunchMode.externalApplication);라
+                              launchUrl(url, mode: LaunchMode.externalApplication);
                             }
                           },
                           child: Text(
