@@ -4,7 +4,6 @@ import 'package:url_launcher/link.dart';
 import 'dart:convert';
 import 'dart:async';
 
-import '../components/modal_button.dart'; // TODO: 수정 예정
 import '../components/category_value_with_bar.dart';
 import 'package:http/http.dart' as http;
 
@@ -93,12 +92,6 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
     }
   }
 
-  void activateDevice(String device) async {
-    final response =
-    await http.get(Uri.parse('http://43.201.136.217/activate/${device}'));
-    print(response.statusCode);
-  }
-
   Future<void> openBrowser() async {
     final Uri url =
     Uri(scheme: 'https', host: 'www.cylog.org', path: 'headers/');
@@ -123,6 +116,13 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
     }
   }
 
+  void activateDevice(String device) async {
+    final response =
+    await http.get(Uri.parse('http://43.201.136.217/activate/${device}'));
+    print(response.statusCode);
+  }
+
+  // pump, led, fan 작동 버튼
   Widget _deviceControlButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -237,149 +237,140 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
         shadowColor: Colors.transparent,
       ),
       body: ListView(
-            // padding: EdgeInsets.symmetric(horizontal: 10.0),
-            children: <Widget> [
-              SizedBox(height: 30),
-              Row(
+        children: <Widget> [
+          SizedBox(height: 30),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(width: 40),
+              Image.asset("assets/images/plant.PNG", height: 310,),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(width: 40),
-                  Image.asset("assets/images/plant.PNG", height: 310,),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget> [
-                          SizedBox(width: 19),
-                          Container(
-                            width: 4,
-                            height: 25,
-                            color: Color.fromRGBO(253, 132, 17, 0.8),
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            'My Plant',
-                            style: TextStyle(
-                              fontFamily: "IBM",
-                              color: Colors.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )
-                        ],
+                  Row(
+                    children: <Widget> [
+                      SizedBox(width: 19),
+                      Container(
+                        width: 4,
+                        height: 25,
+                        color: Color.fromRGBO(253, 132, 17, 0.8),
                       ),
-                      SizedBox(height: 40),
-                      CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), temp, 22, Colors.white, 'Temperature', 11, Colors.white),
-                      SizedBox(height: 20),
-                      CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), humidity, 22, Colors.white, 'Humidity', 11, Colors.white),
-                      SizedBox(height: 20),
-                      CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), soilMoisture, 22, Colors.white, 'Soil moisture', 11, Colors.white),
-                      SizedBox(height: 20),
-                      CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), daylight, 22, Colors.white, 'Daylight', 11, Colors.white),
+                      SizedBox(width: 12),
+                      Text(
+                        'My Plant',
+                        style: TextStyle(
+                          fontFamily: "IBM",
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
                     ],
                   ),
+                  SizedBox(height: 40),
+                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), temp, 22, Colors.white, 'Temperature', 11, Colors.white),
+                  SizedBox(height: 20),
+                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), humidity, 22, Colors.white, 'Humidity', 11, Colors.white),
+                  SizedBox(height: 20),
+                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), soilMoisture, 22, Colors.white, 'Soil moisture', 11, Colors.white),
+                  SizedBox(height: 20),
+                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), daylight, 22, Colors.white, 'Daylight', 11, Colors.white),
                 ],
               ),
-              SizedBox(height: 30),
-              Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(33),
+            ],
+          ),
+          SizedBox(height: 30),
+          Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(33),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 5,
+                          offset: Offset(0,9)
+                      )
+                    ]
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: 30),
+                    CategoryValuesWithBar(180, 2, 25, Color.fromRGBO(253, 132, 17, 0.8), 'Auto-care Status', 15, Colors.black, "${select_setting!['name']}", 12, Color.fromRGBO(63, 60, 60, 1)),
+                    SizedBox(height: 20),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.055,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
                         color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black12.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 5,
-                              offset: Offset(0,9)
-                          )
-                        ]
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 30),
-                        CategoryValuesWithBar(180, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), 'Auto-care Status', 15, Colors.black, "${select_setting!['name']}", 12, Color.fromRGBO(63, 60, 60, 1)),
-                        SizedBox(height: 20),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: MediaQuery.of(context).size.height * 0.055,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20.0),
-                            color: Colors.white,
-                          ),
-                          child: Padding(
-                            padding:
-                            const EdgeInsets.only(left: 20.0, right: 20.0),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton(
-                                value: selected_setting,
-                                items: settings!.map((value) {
-                                  return DropdownMenuItem(
-                                    value: value,
-                                    child: Text(value['name']),
-                                  );
-                                }).toList(),
-                                hint: Container(
-                                  child: Text(
-                                    "Select Auto-care Settings",
-                                    style: TextStyle(color: Colors.grey),
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    selected_setting = value;
-                                  });
-                                  print(selected_setting['_id']);
-                                  setSelectSetting(selected_setting['_id']);
-                                },
+                      ),
+                      child: Padding(
+                        padding:
+                        const EdgeInsets.only(left: 20.0, right: 20.0),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: selected_setting,
+                            items: settings!.map((value) {
+                              return DropdownMenuItem(
+                                value: value,
+                                child: Text(value['name']),
+                              );
+                            }).toList(),
+                            hint: Container(
+                              child: Text(
+                                "Select Auto-care Settings",
+                                style: TextStyle(color: Colors.grey),
+                                textAlign: TextAlign.end,
                               ),
                             ),
+                            onChanged: (value) {
+                              setState(() {
+                                selected_setting = value;
+                              });
+                              setSelectSetting(selected_setting['_id']);
+                            },
                           ),
                         ),
-                        SizedBox(height: 18),
-                        _deviceControlButton(), // 장치 작동 버튼
-                        SizedBox(height: 18),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(33)
-                            ),
-                            primary: Color.fromRGBO(135, 125, 124, 0.8),
-                            minimumSize: Size(335,60),
-                            // alignment: Alignment.center,
-                          ),
-                          onPressed: () async {   //TODO: 카메라
-                            final url = Uri.parse('https://google.com');
-                            if (await canLaunchUrl(url)) {
-                              launchUrl(url, mode: LaunchMode.externalApplication);
-                            }
-                          },
-                          child: Text(
-                            'Real-time Monitoring',
-                            style: TextStyle(
-                              fontFamily: "IBM",
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 300),
-                      ],
+                      ),
                     ),
-                    width: double.infinity,
-                  )
-                ],
-              ),
-              // Container(
-              //   color: Colors.white,
-              //   width: double.infinity,
-              //   height: 100
-              // )
+                    SizedBox(height: 18),
+                    _deviceControlButton(), // 장치 작동 버튼
+                    SizedBox(height: 18),
+                    ElevatedButton(
+                      child: Text(
+                        'Real-time Monitoring',
+                        style: TextStyle(
+                          fontFamily: "IBM",
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(33)
+                        ),
+                        primary: Color.fromRGBO(135, 125, 124, 0.8),
+                        minimumSize: Size(335,60),
+                      ),
+                      onPressed: () async {   //TODO: 카메라
+                        final url = Uri.parse('https://google.com');
+                        if (await canLaunchUrl(url)) {
+                          launchUrl(url, mode: LaunchMode.externalApplication);
+                        }
+                      },
+                    ),
+                    SizedBox(height: 300),
+                  ],
+                ),
+              )
             ],
-          )
+          ),
+        ],
+      )
     );
   }
 }
