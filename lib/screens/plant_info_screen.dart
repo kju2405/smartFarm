@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/link.dart';
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../components/category_value_with_bar.dart';
-import 'package:http/http.dart' as http;
-
 import '../data/network.dart';
+
 
 class PlantInfoScreen extends StatefulWidget {
   @override
@@ -91,30 +91,19 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
       throw Exception('Failed to load data');
     }
   }
-
-  Future<void> openBrowser() async {
-    final Uri url =
-    Uri(scheme: 'https', host: 'www.cylog.org', path: 'headers/');
-    if (!await launchUrl(
-      url,
-      mode: LaunchMode.externalApplication,
-    )) {
-      throw 'Could not launch $url';
-    }
-  }
-
-  Future<void> _launchInWebViewOrVC() async {
-    final Uri url =
-    Uri(scheme: 'https', host: 'www.cylog.org', path: 'headers/');
-    if (!await launchUrl(
-      url,
-      mode: LaunchMode.inAppWebView,
-      webViewConfiguration: const WebViewConfiguration(
-          headers: <String, String>{'my_header_key': 'my_header_value'}),
-    )) {
-      throw 'Could not launch $url';
-    }
-  }
+  //
+  // Future<void> _launchInWebViewOrVC() async {
+  //   final Uri url =
+  //   Uri(scheme: 'https', host: 'www.cylog.org', path: 'headers/');
+  //   if (!await launchUrl(
+  //     url,
+  //     mode: LaunchMode.inAppWebView,
+  //     webViewConfiguration: const WebViewConfiguration(
+  //         headers: <String, String>{'my_header_key': 'my_header_value'}),
+  //   )) {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 
   void activateDevice(String device) async {
     final response =
