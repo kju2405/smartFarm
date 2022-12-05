@@ -168,25 +168,34 @@ class _MainScreenState extends State<MainScreen> {
                       ],
                     ),
                   ),
-                  Container(
-                    height: 150,
-                    width: MediaQuery.of(context).size.width - 80,
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                  ),
-                  Container(
-                    height: 100,
-                    width: MediaQuery.of(context).size.width - 80,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(15),
-                        bottomRight: Radius.circular(15),
+                  SizedBox(height:20),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(width: 60),
+                      Image.asset("assets/images/plant.PNG", height: 200),
+                      SizedBox(width: 12),
+                      Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            SizedBox(height: 170),
+                            Text(
+                              'Areca Palm',
+                              style: TextStyle(
+                                fontFamily: "IBM",
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            )
+                          ],
+                        )
                       ),
-                    ),
-                  )
+
+                    ],
+                  ),
                 ],
               ),
             ),
