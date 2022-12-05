@@ -346,7 +346,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
                         minimumSize: Size(335,60),
                       ),
                       onPressed: () async {   //TODO: 카메라
-                        final url = Uri.parse('https://google.com');
+                        final url = Uri.parse('http://172.20.10.13:8080/stream_simple.html');
                         if (await canLaunchUrl(url)) {
                           launchUrl(url, mode: LaunchMode.externalApplication);
                         }
