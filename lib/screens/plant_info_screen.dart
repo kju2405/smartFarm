@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../components/category_value_with_bar.dart';
 import '../data/network.dart';
 
-
 class PlantInfoScreen extends StatefulWidget {
   @override
   _PlantInfoScreenState createState() => _PlantInfoScreenState();
@@ -21,9 +20,13 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
   late String soilMoisture = '';
   late String daylight = '';
   late String settingName = '';
-  late List settings =[];
+  late List settings = [];
   var selected_setting;
   late Map select_setting = {};
+
+  bool activatedFan = false;
+  bool activatedPump = false;
+  bool activatedLed = false;
 
   @override
   void initState() {
@@ -33,7 +36,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
 
   void getSettings() async {
     final response =
-    await http.get(Uri.parse('http://43.201.136.217/settings'));
+        await http.get(Uri.parse('http://43.201.136.217/settings'));
     if (response.statusCode == 200) {
       setState(() {
         settings = json.decode(response.body);
@@ -45,25 +48,28 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
 
   void fetchData() async {
     Network sensorNetwork = Network('http://43.201.136.217/sensors');
-    Network currentSettingNetwork = Network('http://43.201.136.217/get/setting');
+    Network currentSettingNetwork =
+        Network('http://43.201.136.217/get/setting');
 
     var sensorData = await sensorNetwork.getJsonData();
     var settingData = await currentSettingNetwork.getJsonData();
 
     Future.delayed(Duration(milliseconds: 100), () {
       setState(() {
-
         select_setting = settingData;
 
-        for(int i=0; i < sensorData.length; i++){
-          if(sensorData[i]['name'] == 'temp') this.temp = sensorData[i]['value'].toInt().toString() + '℃' ;
-          if(sensorData[i]['name'] == 'humidity') this.humidity = sensorData[i]['value'].toInt().toString() + '%';
-          if(sensorData[i]['name'] == 'moisture') this.soilMoisture = sensorData[i]['value'].toString() + '%';
+        for (int i = 0; i < sensorData.length; i++) {
+          if (sensorData[i]['name'] == 'temp')
+            this.temp = sensorData[i]['value'].toInt().toString() + '℃';
+          if (sensorData[i]['name'] == 'humidity')
+            this.humidity = sensorData[i]['value'].toInt().toString() + '%';
+          if (sensorData[i]['name'] == 'moisture')
+            this.soilMoisture = sensorData[i]['value'].toString() + '%';
           // TODO: daylight 수준 임의 설정 => 확인 필요
-          if(sensorData[i]['name'] == 'light') {
-            if(sensorData[i]['value'] > 800){
+          if (sensorData[i]['name'] == 'light') {
+            if (sensorData[i]['value'] > 800) {
               this.daylight = 'High';
-            } else if(sensorData[i]['value'] > 400) {
+            } else if (sensorData[i]['value'] > 400) {
               this.daylight = 'Medium';
             } else {
               this.daylight = 'Low';
@@ -107,8 +113,32 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
 
   void activateDevice(String device) async {
     final response =
-    await http.get(Uri.parse('http://43.201.136.217/activate/${device}'));
+        await http.get(Uri.parse('http://43.201.136.217/activate/${device}'));
     print(response.statusCode);
+    setState(() {
+      if (device == 'pump') {
+        activatedPump = true;
+      } else if (device == 'fan') {
+        activatedFan = true;
+      } else if (device == 'led') {
+        activatedLed = true;
+      }
+    });
+  }
+
+  void deactivateDevice(String device) async {
+    final response =
+        await http.get(Uri.parse('http://43.201.136.217/deactivate/${device}'));
+    print(response.statusCode);
+    setState(() {
+      if (device == 'pump') {
+        activatedPump = false;
+      } else if (device == 'fan') {
+        activatedFan = false;
+      } else if (device == 'led') {
+        activatedLed = false;
+      }
+    });
   }
 
   // pump, led, fan 작동 버튼
@@ -118,15 +148,16 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
       children: [
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(33)
-            ),
-            primary: Color.fromRGBO(253, 132, 17, 0.8),
-            minimumSize: Size(100,100),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
+            primary: activatedPump
+                ? Color.fromRGBO(253, 132, 17, 0.8)
+                : Color.fromARGB(204, 189, 187, 185),
+            minimumSize: Size(100, 100),
             // alignment: Alignment.center,
           ),
           child: Column(
-            children: <Widget> [
+            children: <Widget>[
               Icon(Icons.water_drop_outlined, size: 50),
               Text(
                 'water',
@@ -140,21 +171,26 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
             ],
           ),
           onPressed: () async {
-            activateDevice('pump');
+            if (activatedPump == false) {
+              activateDevice('pump');
+            } else {
+              deactivateDevice('pump');
+            }
           },
         ),
-        SizedBox(width:10),
+        SizedBox(width: 10),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(33)
-            ),
-            primary: Color.fromRGBO(253, 132, 17, 0.8),
-            minimumSize: Size(100,100),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
+            primary: activatedLed
+                ? Color.fromRGBO(253, 132, 17, 0.8)
+                : Color.fromARGB(204, 189, 187, 185),
+            minimumSize: Size(100, 100),
             // alignment: Alignment.center,
           ),
           child: Column(
-            children: <Widget> [
+            children: <Widget>[
               Icon(Icons.wb_sunny_outlined, size: 50),
               Text(
                 'light',
@@ -168,21 +204,26 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
             ],
           ),
           onPressed: () async {
-            activateDevice('led');
+            if (activatedLed == false) {
+              activateDevice('led');
+            } else {
+              deactivateDevice('led');
+            }
           },
         ),
-        SizedBox(width:10),
+        SizedBox(width: 10),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(33)
-            ),
-            primary: Color.fromRGBO(253, 132, 17, 0.8),
-            minimumSize: Size(100,100),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(33)),
+            primary: activatedFan
+                ? Color.fromRGBO(253, 132, 17, 0.8)
+                : Color.fromARGB(204, 189, 187, 185),
+            minimumSize: Size(100, 100),
             // alignment: Alignment.center,
           ),
           child: Column(
-            children: <Widget> [
+            children: <Widget>[
               Icon(Icons.wind_power_outlined, size: 50),
               Text(
                 'wind',
@@ -196,7 +237,11 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
             ],
           ),
           onPressed: () async {
-            activateDevice('fan');
+            if (activatedFan == false) {
+              activateDevice('fan');
+            } else {
+              deactivateDevice('fan');
+            }
           },
         ),
       ],
@@ -205,161 +250,213 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(16, 164, 74, 1),
-      appBar: AppBar(
         backgroundColor: Color.fromRGBO(16, 164, 74, 1),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios),
-          color: Colors.white,
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.refresh),
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(16, 164, 74, 1),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_ios),
             color: Colors.white,
-            onPressed: () => fetchData(),
-            iconSize: 30,
           ),
-        ],
-        shadowColor: Colors.transparent,
-      ),
-      body: ListView(
-        children: <Widget> [
-          SizedBox(height: 30),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(width: 40),
-              Image.asset("assets/images/plant.PNG", height: 310,),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: <Widget> [
-                      SizedBox(width: 19),
-                      Container(
-                        width: 4,
-                        height: 25,
-                        color: Color.fromRGBO(253, 132, 17, 0.8),
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'My Plant',
-                        style: TextStyle(
-                          fontFamily: "IBM",
-                          color: Colors.white,
-                          fontSize: 25,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 40),
-                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), temp, 22, Colors.white, 'Temperature', 11, Colors.white),
-                  SizedBox(height: 20),
-                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), humidity, 22, Colors.white, 'Humidity', 11, Colors.white),
-                  SizedBox(height: 20),
-                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), soilMoisture, 22, Colors.white, 'Soil moisture', 11, Colors.white),
-                  SizedBox(height: 20),
-                  CategoryValuesWithBar(22, 2, 25, Color.fromRGBO(135, 125, 124, 0.7), daylight, 22, Colors.white, 'Daylight', 11, Colors.white),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 30),
-          Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(33),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black12.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 5,
-                          offset: Offset(0,9)
-                      )
-                    ]
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              color: Colors.white,
+              onPressed: () => fetchData(),
+              iconSize: 30,
+            ),
+          ],
+          shadowColor: Colors.transparent,
+        ),
+        body: ListView(
+          children: <Widget>[
+            SizedBox(height: 30),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(width: 40),
+                Image.asset(
+                  "assets/images/plant.PNG",
+                  height: 310,
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 30),
-                    CategoryValuesWithBar(180, 2, 25, Color.fromRGBO(253, 132, 17, 0.8), 'Auto-care Status', 15, Colors.black, "${select_setting!['name']}", 12, Color.fromRGBO(63, 60, 60, 1)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        SizedBox(width: 19),
+                        Container(
+                          width: 4,
+                          height: 25,
+                          color: Color.fromRGBO(253, 132, 17, 0.8),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'My Plant',
+                          style: TextStyle(
+                            fontFamily: "IBM",
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 40),
+                    CategoryValuesWithBar(
+                        22,
+                        2,
+                        25,
+                        Color.fromRGBO(135, 125, 124, 0.7),
+                        temp,
+                        22,
+                        Colors.white,
+                        'Temperature',
+                        11,
+                        Colors.white),
                     SizedBox(height: 20),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      height: MediaQuery.of(context).size.height * 0.055,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.white,
-                      ),
-                      child: Padding(
-                        padding:
-                        const EdgeInsets.only(left: 20.0, right: 20.0),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            value: selected_setting,
-                            items: settings!.map((value) {
-                              return DropdownMenuItem(
-                                value: value,
-                                child: Text(value['name']),
-                              );
-                            }).toList(),
-                            hint: Container(
-                              child: Text(
-                                "Select Auto-care Settings",
-                                style: TextStyle(color: Colors.grey),
-                                textAlign: TextAlign.end,
+                    CategoryValuesWithBar(
+                        22,
+                        2,
+                        25,
+                        Color.fromRGBO(135, 125, 124, 0.7),
+                        humidity,
+                        22,
+                        Colors.white,
+                        'Humidity',
+                        11,
+                        Colors.white),
+                    SizedBox(height: 20),
+                    CategoryValuesWithBar(
+                        22,
+                        2,
+                        25,
+                        Color.fromRGBO(135, 125, 124, 0.7),
+                        soilMoisture,
+                        22,
+                        Colors.white,
+                        'Soil moisture',
+                        11,
+                        Colors.white),
+                    SizedBox(height: 20),
+                    CategoryValuesWithBar(
+                        22,
+                        2,
+                        25,
+                        Color.fromRGBO(135, 125, 124, 0.7),
+                        daylight,
+                        22,
+                        Colors.white,
+                        'Daylight',
+                        11,
+                        Colors.white),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(33),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black12.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 5,
+                            offset: Offset(0, 9))
+                      ]),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 30),
+                      CategoryValuesWithBar(
+                          180,
+                          2,
+                          25,
+                          Color.fromRGBO(253, 132, 17, 0.8),
+                          'Auto-care Status',
+                          15,
+                          Colors.black,
+                          "${select_setting!['name']}",
+                          12,
+                          Color.fromRGBO(63, 60, 60, 1)),
+                      SizedBox(height: 20),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.055,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.0),
+                          color: Colors.white,
+                        ),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 20.0, right: 20.0),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              value: selected_setting,
+                              items: settings!.map((value) {
+                                return DropdownMenuItem(
+                                  value: value,
+                                  child: Text(value['name']),
+                                );
+                              }).toList(),
+                              hint: Container(
+                                child: Text(
+                                  "Select Auto-care Settings",
+                                  style: TextStyle(color: Colors.grey),
+                                  textAlign: TextAlign.end,
+                                ),
                               ),
+                              onChanged: (value) {
+                                setState(() {
+                                  selected_setting = value;
+                                });
+                                setSelectSetting(selected_setting['_id']);
+                              },
                             ),
-                            onChanged: (value) {
-                              setState(() {
-                                selected_setting = value;
-                              });
-                              setSelectSetting(selected_setting['_id']);
-                            },
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 18),
-                    _deviceControlButton(), // 장치 작동 버튼
-                    SizedBox(height: 18),
-                    ElevatedButton(
-                      child: Text(
-                        'Real-time Monitoring',
-                        style: TextStyle(
-                          fontFamily: "IBM",
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                      SizedBox(height: 18),
+                      _deviceControlButton(), // 장치 작동 버튼
+                      SizedBox(height: 18),
+                      ElevatedButton(
+                        child: Text(
+                          'Real-time Monitoring',
+                          style: TextStyle(
+                            fontFamily: "IBM",
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(33)
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(33)),
+                          primary: Color.fromRGBO(135, 125, 124, 0.8),
+                          minimumSize: Size(335, 60),
                         ),
-                        primary: Color.fromRGBO(135, 125, 124, 0.8),
-                        minimumSize: Size(335,60),
+                        onPressed: () async {
+                          //TODO: 카메라
+                          final url = Uri.parse(
+                              'http://172.20.10.13:8080/stream_simple.html');
+                          if (await canLaunchUrl(url)) {
+                            launchUrl(url,
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
                       ),
-                      onPressed: () async {   //TODO: 카메라
-                        final url = Uri.parse('http://172.20.10.13:8080/stream_simple.html');
-                        if (await canLaunchUrl(url)) {
-                          launchUrl(url, mode: LaunchMode.externalApplication);
-                        }
-                      },
-                    ),
-                    SizedBox(height: 300),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ],
-      )
-    );
+                      SizedBox(height: 300),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ],
+        ));
   }
 }
